@@ -1,9 +1,8 @@
-import { configureStore } from "@reduxjs/toolkit";
-import { fetchStorage } from "../reducers/index";
-const store = configureStore({
-  reducer: {
-    songs: fetchStorage,
-  },
-});
+import { createStore, applyMiddleware } from "redux";
+import { thunk } from "redux-thunk";
+
+import dataReducer from "./reducers";
+
+const store = createStore(dataReducer, applyMiddleware(thunk.default || thunk));
 
 export default store;

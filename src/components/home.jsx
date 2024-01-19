@@ -1,19 +1,47 @@
-import React from "react";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import React, { useEffect } from "react";
+import { Container, Row, Col, Card, CardImg } from "react-bootstrap";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { fetchDataFailure, fetchDataSuccess, fetchQueryDataSuccess } from "../redux/actions/results";
 
-const Home = () => {
+const Home = (params) => {
+  const dispatch = useDispatch();
+  const fetchData = async (query) => {
+    fetchDataSuccess();
+    try {
+      const response = await fetch(`https://striveschool-api.herokuapp.com/api/deezer/search?q=${query}`);
+      const data = await response.json();
+      //setTimeout(function() { //puoi commentare/decommentare questo timeout per attendere 5 secondi la risposta e mostrare il loader (insieme alla riga sotto)
+      fetchQueryDataSuccess(data);
+      //}, 5000)
+    } catch (error) {
+      fetchDataFailure(error.message);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, [fetchDataSuccess, fetchDataFailure, fetchQueryDataSuccess]);
   return (
     <Container fluid className="mainPage">
       <Row>
         <Col xs={12} md={9} className="offset-md-3">
           <Row>
             <Col xs={9} lg={11} className="mainLinks d-none d-md-flex">
-              <Link to="/">TRENDING</Link>
-              <Link to="/">PODCAST</Link>
-              <Link to="/">MOODS AND GENRES</Link>
-              <Link to="/">NEW RELEASES</Link>
-              <Link to="/">DISCOVER</Link>
+              <Link className="toplink" to="/">
+                TRENDING
+              </Link>
+              <Link className="toplink" to="/">
+                PODCAST
+              </Link>
+              <Link className="toplink" to="/">
+                MOODS AND GENRES
+              </Link>
+              <Link className="toplink" to="/">
+                NEW RELEASES
+              </Link>
+              <Link className="toplink" to="/">
+                DISCOVER
+              </Link>
             </Col>
           </Row>
 
@@ -30,7 +58,8 @@ const Home = () => {
           {/* Rock Classics */}
           <Row>
             <Col xs={10}>
-              <Card>
+              <Card onLoad={dispatch(fetchData(params.rock))}>
+                <CardImg variant="top" src={state.picture_medium} />
                 <Card.Body>
                   <Card.Title>Rock Classics</Card.Title>
                   <Row

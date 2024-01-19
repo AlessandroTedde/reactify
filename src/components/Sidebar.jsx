@@ -3,6 +3,7 @@ import { InputGroup, FormControl, Button, Navbar, Nav } from "react-bootstrap";
 import { BookFill, HouseDoorFill } from "react-bootstrap-icons";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { FETCH_QUERY_DATA_SUCCESS, fetchQueryDataSuccess, fetchDataFailure } from "../redux/actions/results";
 
 const Sidebar = (props) => {
   const dispatch = useDispatch();
@@ -13,14 +14,14 @@ const Sidebar = (props) => {
       const response = await fetch(`https://striveschool-api.herokuapp.com/api/deezer/search?q=${query}`);
       if (response.ok) {
         const data = await response.json();
-        dispatch({ type: "main", payload: data.data });
+        dispatch(fetchQueryDataSuccess(FETCH_QUERY_DATA_SUCCESS, data.data));
       } else if (response.status === 400) {
         console.log("Bad request");
       } else {
         console.log("Request failed");
       }
     } catch (error) {
-      console.log(error);
+      dispatch(fetchDataFailure(error));
     }
   };
 

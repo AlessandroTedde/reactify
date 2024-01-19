@@ -1,16 +1,18 @@
-import { fetchStorage } from "../reducers/index";
-export const fetchSongsAction = (url, query) => async (dispatch) => {
-  try {
-    const response = await fetch(url + query);
+export const FETCH_DATA_SUCCESS = "FETCH_DATA_SUCCESS";
+export const FETCH_DATA_FAILURE = "FETCH_DATA_FAILURE";
+export const FETCH_QUERY_DATA_SUCCESS = "FETCH_QUERY_DATA_SUCCESS";
 
-    if (response.ok) {
-      const { data } = await response.json();
-      dispatch(fetchStorage(data));
-    } else {
-      throw new Error("Errore nel recupero dei risultati");
-    }
-  } catch (error) {
-    // Puoi gestire gli errori qui, se necessario
-    console.error("Errore nel fetch:", error.message);
-  }
-};
+export const fetchDataSuccess = (data) => ({
+  type: FETCH_DATA_SUCCESS,
+  payload: data,
+});
+
+export const fetchDataFailure = (error) => ({
+  type: FETCH_DATA_FAILURE,
+  payload: error,
+});
+
+export const fetchQueryDataSuccess = (data) => ({
+  type: FETCH_QUERY_DATA_SUCCESS,
+  payload: data,
+});
