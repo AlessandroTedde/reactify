@@ -1,20 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { InputGroup, FormControl, Button, Navbar, Nav } from "react-bootstrap";
 import { BookFill, HouseDoorFill } from "react-bootstrap-icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { FETCH_QUERY_DATA_SUCCESS, fetchQueryDataSuccess, fetchDataFailure } from "../redux/actions/results";
+import { SET_QUERY, fetchDataFailure, fetchDataSuccess } from "../redux/actions/results";
 
 const Sidebar = (props) => {
   const dispatch = useDispatch();
-  const [query, setQuery] = useState("");
-
+  const query = useSelector((state) => state.data.query);
   const handleSearch = async () => {
     try {
-      const response = await fetch(`https://striveschool-api.herokuapp.com/api/deezer/search?q=${query}`);
+      const response = await fetch(`https://striveschool-api.herokuapp.com/api/deezer/search?q=` + query);
       if (response.ok) {
         const data = await response.json();
-        dispatch(fetchQueryDataSuccess(FETCH_QUERY_DATA_SUCCESS, data.data));
+        dispatch(fetchDataSuccess(data));
       } else if (response.status === 400) {
         console.log("Bad request");
       } else {
@@ -26,11 +25,16 @@ const Sidebar = (props) => {
   };
 
   const handleChange = (event) => {
-    setQuery(event.target.value);
+    if (event.key === "Enter") {
+      dispatch({
+        type: SET_QUERY,
+        payload: event.target.value,
+      });
+    }
   };
   useEffect(() => {
-    console.log("ciao sidebar");
-  });
+    handleSearch();
+  }, [query]);
   return (
     <Navbar expand="md" fixed="left" className="d-none d-md-flex">
       <Link className="navbar-brand" to="/">
@@ -50,10 +54,9 @@ const Sidebar = (props) => {
               placeholder="Search"
               aria-label="Search"
               aria-describedby="basic-addon2"
-              value={query}
               onChange={handleChange}
             />
-            <Button variant="outline-secondary" id="button-addon2" onClick={handleSearch}>
+            <Button variant="outline-secondary" id="button-addon2" onClick={handleChange}>
               GO
             </Button>
           </InputGroup>

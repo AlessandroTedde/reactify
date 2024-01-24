@@ -1,26 +1,40 @@
 import React, { useEffect } from "react";
 import { Container, Row, Col, Card, CardImg } from "react-bootstrap";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { fetchDataFailure, fetchDataSuccess, fetchQueryDataSuccess } from "../redux/actions/results";
+import {
+  FETCH_DATA_FAILURE,
+  fetchDataSuccess,
+  fetchHipHopArtist,
+  fetchPopArtist,
+  fetchRockArtist,
+} from "../redux/actions/results";
 
-const Home = (params) => {
+const Home = () => {
   const dispatch = useDispatch();
-  const fetchData = async (query) => {
-    fetchDataSuccess();
+  const query = useSelector((state) => state.data.query);
+  const dynamicMusic = useSelector((state) => state.data.data);
+  const rockMusic = useSelector((state) => state.data.dataRock);
+  const popMusic = useSelector((state) => state.data.dataPop);
+  const hipHopMusic = useSelector((state) => state.data.dataHipHop);
+
+  const fetchData = async (search) => {
     try {
-      const response = await fetch(`https://striveschool-api.herokuapp.com/api/deezer/search?q=${query}`);
+      const response = await fetch(`https://striveschool-api.herokuapp.com/api/deezer/search?q=` + search);
       const data = await response.json();
       //setTimeout(function() { //puoi commentare/decommentare questo timeout per attendere 5 secondi la risposta e mostrare il loader (insieme alla riga sotto)
-      fetchQueryDataSuccess(data);
+      dispatch(fetchDataSuccess(data));
       //}, 5000)
     } catch (error) {
-      fetchDataFailure(error.message);
+      dispatch({
+        type: FETCH_DATA_FAILURE,
+        payload: error,
+      });
     }
   };
   useEffect(() => {
-    fetchData();
-  }, [fetchDataSuccess, fetchDataFailure, fetchQueryDataSuccess]);
+    fetchData(query);
+  }, [query]);
   return (
     <Container fluid className="mainPage">
       <Row>
@@ -46,20 +60,28 @@ const Home = (params) => {
           </Row>
 
           {/* Search Results */}
-          <Row>
-            <Col xs={10}>
-              <div id="searchResults" style={{ display: "none" }}>
-                <h2>Search Results</h2>
-                <Row className="row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 imgLinks py-3"></Row>
-              </div>
-            </Col>
-          </Row>
+          {query && (
+            <Row>
+              <Col xs={10}>
+                <Card>
+                  <CardImg variant="top" src={dynamicMusic.picture_medium} />
+                  <Card.Body>
+                    <Card.Title>Search Results</Card.Title>
+                    <Row
+                      className="row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 imgLinks py-3"
+                      id="rockSection"
+                    ></Row>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+          )}
 
           {/* Rock Classics */}
           <Row>
             <Col xs={10}>
-              <Card onLoad={dispatch(fetchData(params.rock))}>
-                <CardImg variant="top" src={state.picture_medium} />
+              <Card onLoad={fetchRockArtist("queen")}>
+                <CardImg variant="top" src={rockMusic.picture_medium} />
                 <Card.Body>
                   <Card.Title>Rock Classics</Card.Title>
                   <Row
@@ -74,7 +96,8 @@ const Home = (params) => {
           {/* Pop Culture */}
           <Row>
             <Col xs={10}>
-              <Card>
+              <Card onLoad={fetchPopArtist("rihanna")}>
+                <CardImg variant="top" src={popMusic.picture_medium} />
                 <Card.Body>
                   <Card.Title>Pop Culture</Card.Title>
                   <Row
@@ -89,7 +112,8 @@ const Home = (params) => {
           {/* #HipHop */}
           <Row>
             <Col xs={10}>
-              <Card>
+              <Card onLoad={fetchHipHopArtist("eminem")}>
+                <CardImg variant="top" src={hipHopMusic.picture_medium} />
                 <Card.Body>
                   <Card.Title>#HipHop</Card.Title>
                   <Row

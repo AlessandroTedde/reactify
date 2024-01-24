@@ -1,9 +1,19 @@
-import { FETCH_DATA_SUCCESS, FETCH_DATA_FAILURE, FETCH_QUERY_DATA_SUCCESS } from "../actions/results.js";
+import {
+  FETCH_DATA_SUCCESS,
+  FETCH_DATA_FAILURE,
+  SET_QUERY,
+  FETCH_ROCK_ARTIST,
+  FETCH_POP_ARTIST,
+  FETCH_HIPHOP_ARTIST,
+} from "../actions/results.js";
 
 const initialState = {
   data: [],
   error: null,
-  data2: {} /*aggiunta*/,
+  dataRock: [],
+  dataPop: [],
+  dataHipHop: [],
+  query: "yello",
 };
 
 const dataReducer = (state = initialState, action) => {
@@ -20,13 +30,31 @@ const dataReducer = (state = initialState, action) => {
         data: [],
         error: action.payload,
       };
-    case FETCH_QUERY_DATA_SUCCESS:
+    case FETCH_ROCK_ARTIST:
       console.log(action.payload);
       return {
         ...state,
-        loading: false,
-        data2: action.payload,
+        dataRock: action.payload,
         error: null,
+      };
+    case FETCH_POP_ARTIST:
+      console.log(action.payload);
+      return {
+        ...state,
+        dataPop: action.payload,
+        error: null,
+      };
+    case FETCH_HIPHOP_ARTIST:
+      console.log(action.payload);
+      return {
+        ...state,
+        dataHipHop: action.payload,
+        error: null,
+      };
+    case SET_QUERY:
+      return {
+        ...state,
+        query: action.payload,
       };
     default:
       return state;
